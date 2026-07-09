@@ -4,22 +4,28 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const { body, validationResult } = require('express-validator');
 
+
+const tareasRouter = require('./routes/tareas');
+
 const app = express();
 
-app.use(helmet());              // cabeceras de seguridad HTTP
-app.use(express.json());        // parseo seguro de JSON
-app.use(morgan('dev'));         // bitácora de peticiones
+app.use(helmet());              // Cabeceras de seguridad HTTP
+app.use(express.json());        // Parseo seguro de JSON
+app.use(morgan('dev'));         // Bitácora de peticiones
 
-// Ruta de prueba con validación de entrada
+
+app.use('/api/tareas', tareasRouter);
+
+// Ruta de prueba con validación de entrada (Sesión 1)
 app.post(
     '/api/echo',
     body('mensaje').isString().trim().isLength({ min: 1, max: 200 }).escape(),
     (req, res) => {
-    const errores = validationResult(req);
-    if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() });
-    }
-    res.json({ recibido: req.body.mensaje });
+        const errores = validationResult(req);
+        if (!errores.isEmpty()) {
+            return res.status(400).json({ errores: errores.array() });
+        }
+        res.json({ recibido: req.body.mensaje });
     }
 );
 
@@ -27,14 +33,7 @@ app.get('/api/salud', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-// =========================================================================
-// JUSTIFICACIÓN DE CODIFICACIÓN SEGURA:
-// Este endpoint aplica el principio de "Validación de Entradas" (Input Validation)
-// y "Defensa en Profundidad". Nunca se debe confiar en los datos que envía el cliente.
-// Al validar y sanitizar el correo con .isEmail() y asegurar que el nombre no esté
-// vacío con .notEmpty(), evitamos que datos mal formados, nulos o maliciosos 
-// comprometan la integridad y la lógica de negocio de nuestra aplicación.
-// =========================================================================
+
 app.post(
   '/api/registro',
   [
