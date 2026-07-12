@@ -23,7 +23,6 @@ A continuación, se detalla la justificación y diferencia de cada código utili
 * **¿Qué significa?** Es un error por parte del cliente. Significa que el servidor está en línea, pero el recurso específico solicitado mediante la URL (un endpoint inexistente o un ID que no concuerda) no existe en el sistema.
 * **Ejemplo en el proyecto:** Durante el reto de la sesión, al ejecutar un `DELETE /api/tareas/999`, el servidor busca en el arreglo de memoria el ID `999`. Al verificar que no existe, intercepta la solicitud y responde de forma segura con un `404 Not Found` y el mensaje de error "Tarea no encontrada".
 
----
-
-> **Principio de Diseño Seguro:** El manejo explícito de estos códigos evita que la aplicación exprese excepciones nativas o caídas de infraestructura (`500 Internal Server Error`), protegiendo la lógica interna contra el reconocimiento de vulnerabilidades por parte de atacantes externos.
-EOF
+### Diferencia fundamental entre errores 404 y 502
+* **`404 Not Found`:** Es un error adjudicado enteramente al cliente interno de la API. Significa que nuestro servidor Express funciona bien, pero lo que se está buscando (como un ID de tarea incorrecto) no existe en la memoria o base de datos.
+* **`502 Bad Gateway`:** Es un error de pasarela. Significa que nuestro servidor funciona perfectamente y procesó la solicitud, pero el servicio externo de terceros del que depende (OpenWeatherMap) falló, regresó un error de autenticación, o no respondió a tiempo (`timeout`).

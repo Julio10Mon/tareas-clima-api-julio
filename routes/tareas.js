@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, param, validationResult } = require('express-validator');
 const tareasModel = require('../models/tareas');
+const { obtenerClima } = require('../services/clima'); // Servicio externo
 
 function validar(req, res, next) {
   const errores = validationResult(req);
@@ -46,19 +47,29 @@ router.put(
   }
 );
 
-// ==========================================
-//   RETO DE LA SESIÓN: VERBO DELETE
-// ==========================================
+// DELETE /api/tareas/:id — eliminar (Reto Sesión 2)
 router.delete('/:id', param('id').isInt(), validar, (req, res) => {
   const eliminado = tareasModel.eliminar(Number(req.params.id));
 
   if (!eliminado) {
-    // Responder 404 si el id no existe
     return res.status(404).json({ error: 'Tarea no encontrada' });
   }
-
-  // Responder 204 (sin contenido) si se eliminó correctamente
   res.status(204).send();
+});
+
+// GET /api/tareas/:id/clima — combina la tarea con el clima de una ciudad (Sesión 3)
+router.get('/:id/clima', param('id').isInt(), validar, async (req, res) => {
+  const tarea = tareasModel.obtenerPorId(Number(req.params.id));
+  if (!tarea) return res.status(404).json({ error: 'Tarea no encontrada' });
+
+  const ciudad = req.query.ciudad || 'Ciudad de Mexico';
+
+  try {
+    const clima = await obtenerClima(ciudad);
+    res.status(200).json({ tarea, clima });
+  } catch (error) {
+    res.status(502).json({ error: error.message }); // Error controlado 502 Bad Gateway
+  }
 });
 
 module.exports = router;

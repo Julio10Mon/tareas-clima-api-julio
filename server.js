@@ -4,17 +4,19 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const { body, validationResult } = require('express-validator');
 
-
+// Importación de los Enrutadores Modulares
 const tareasRouter = require('./routes/tareas');
+const climaRouter = require('./routes/clima'); // Enrutador del Reto de la Sesión 3
 
 const app = express();
 
-app.use(helmet());              // Cabeceras de seguridad HTTP
-app.use(express.json());        // Parseo seguro de JSON
-app.use(morgan('dev'));         // Bitácora de peticiones
+app.use(helmet());          // Cabeceras de seguridad HTTP
+app.use(express.json());    // Parseo seguro de JSON
+app.use(morgan('dev'));     // Bitácora de peticiones en consola
 
-
+// Registro de Rutas Modulares Principales
 app.use('/api/tareas', tareasRouter);
+app.use('/api/clima', climaRouter);   // Conexión del reto independiente
 
 // Ruta de prueba con validación de entrada (Sesión 1)
 app.post(
@@ -29,11 +31,12 @@ app.post(
     }
 );
 
+// Endpoint de verificación de estado (Healthcheck)
 app.get('/api/salud', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-
+// Endpoint seguro de registro de usuarios (Sesión 2)
 app.post(
   '/api/registro',
   [
